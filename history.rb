@@ -5,7 +5,7 @@ require 'sequel'
 require 'set'
 require 'time-lord'
 
-DB = Sequel::Database.connect(ENV["DTABASE_URL"] || 'sqlite://db.db')
+DB = Sequel::Database.connect(ENV["DATABASE_URL"] || 'sqlite://db.db')
 
 class Stats
   def initialize
