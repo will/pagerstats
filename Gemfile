@@ -5,8 +5,9 @@ gem 'sinatra'
 gem 'thin'
 gem 'rest-client'
 gem 'json'
-gem 'sqlite3'
 gem 'pg'
 gem 'time-lord'
 gem 'warden'
 gem 'warden-googleapps'
+
+gem 'sqlite3', :group => :development
