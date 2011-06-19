@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'RestClient'
+require 'restclient'
 require 'json'
 require 'sequel'
 require 'set'
