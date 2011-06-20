@@ -8,13 +8,13 @@ require 'time-lord'
 DB = Sequel::Database.connect(ENV["DATABASE_URL"] || 'sqlite://db.db')
 
 class Stats
-  def initialize
+  def initialize(filter = 300)
     @all = DB[:pages].all.each do |i|
       i[:date]      = i[:created_on].to_date
       i[:date_time] = i[:created_on].to_datetime
     end
     kill = Set.new
-    (0..@all.size-2).each {|i| kill << @all[i][:id] if (@all[i+1][:created_on] - @all[i][:created_on]) < 300}
+    (0..@all.size-2).each {|i| kill << @all[i][:id] if (@all[i+1][:created_on] - @all[i][:created_on]) < filter}
     @data = @all.reject{|i| kill.include? i[:id]}
   end
 

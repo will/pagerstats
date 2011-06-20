@@ -13,10 +13,17 @@ class App < Sinatra::Base
     manager[:google_apps_domain] = 'heroku.com'
   end
 
-  get '/' do
+  before do
     throw(:warden) unless env['warden'].authenticate!
+  end
 
+  get '/' do
     @h = Stats.new
+    erb :index
+  end
+
+  get '/filter/:n' do |filter|
+    @h = Stats.new(filter.to_i)
     erb :index
   end
 
