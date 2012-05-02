@@ -79,7 +79,7 @@ module Fetcher
 
   def results(month, offset)
     base = "http://heroku.pagerduty.com/api/v1/incidents?service=PERV0CL"
-    date_range = "from=#{Date.new(2011,month,1)}&until=#{Date.new(2011,month,-1)}"
+    date_range = "from=#{Date.new(2012,month,1)}&until=#{Date.new(2012,month,-1)}"
     r = RestClient::Resource.new("#{base}&offset=#{offset}&#{date_range}",
           :user => USERNAME,
           :password => PASSWORD)
