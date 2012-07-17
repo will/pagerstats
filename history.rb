@@ -71,31 +71,50 @@ end
 
 module Fetcher
   extend self
-  def update
-    write_to_db( month( DateTime.now.month) )
+
+  SERVICES = [
+    'PLHJ8WE', # shogun
+    'P62XYUE', # shogun down
+    'PZF8MN7', # shogun pingdom
+    'P61VPZQ', # shogun direct
+    ] #'PERV0CL', # old shogun down, no longer used
+
+  def update(month = DateTime.now.month)
+    puts "------> updating all services for month #{month}"
+    SERVICES.each do |service|
+      puts "------> fetching service #{service}"
+      incidents = month(service, month)
+      puts "------> done"
+
+      puts "------> saving service #{service}"
+      write_to_db(incidents)
+      puts "------> done"
+    end
     DB[:update].delete
     DB[:update].insert Time.now
   end
 
-  def results(month, offset)
-    base = "http://heroku.pagerduty.com/api/v1/incidents?service=PERV0CL"
-    date_range = "from=#{Date.new(2012,month,1)}&until=#{Date.new(2012,month,-1)}"
+  def month(service, month)
+    set = results(service, month, 0)
+    total = set['total']
+    incidents = set['incidents']
+    (0..total/100).each do |i|
+      puts "fetching month=#{month} service=#{service} offset=#{i*100} total=#{total}"
+      incidents += results(service, month, i*100)['incidents']
+    end
+    incidents
+  end
+
+  def results(service, month, offset)
+    base = "http://heroku.pagerduty.com/api/v1/incidents?service=#{service}"
+    year = 2012
+    date_range = "from=#{Date.new(year,month,1)}&until=#{Date.new(year,month,-1)}"
     r = RestClient::Resource.new("#{base}&offset=#{offset}&#{date_range}",
           :user => USERNAME,
           :password => PASSWORD)
     return JSON.parse(r.get)
   end
 
-  def month(month)
-    set = results(month, 0)
-    total = set['total']
-    incidents = set['incidents']
-    (0..total/100).each do |i|
-      puts "month #{month}. Getting #{i*100} of #{total}..."
-      incidents += results(month, i*100)['incidents']
-    end
-    incidents.select{|i| i['incident_key'] =~ /^Shogun/}
-  end
 
   def write_to_db(incidents)
     incidents.each do |i|
