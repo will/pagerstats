@@ -76,7 +76,7 @@ module DuckUp
 
 
   def by_day
-    DB[%Q(select extract(epoch from date_trunc('day',  created_on))::int as timestamp, count(*) as value from pages group by 1 order by 1 desc limit 31;)].all
+    DB[%Q(select extract(epoch from date_trunc('day',  created_on) + '12 hours'::interval)::int as timestamp, count(*) as value from pages group by 1 order by 1 desc limit 31;)].all
   end
 
   def post_by_day
